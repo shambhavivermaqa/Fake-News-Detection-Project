@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Model & Stats{% endblock %}
+{% block content %}
+<section class="hero hero--compact">
+  <h1>Model &amp; Dataset Statistics</h1>
+  <p class="hero__subtitle">Full transparency on how this model was trained and evaluated.</p>
+</section>
+
+{% if metrics %}
+<section class="stat-cards">
+  <div class="stat-card">
+    <span class="stat-card__value">{{ metrics.dataset_size }}</span>
+    <span class="stat-card__label">Total Articles</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card__value">{{ metrics.train_size }} / {{ metrics.test_size }}</span>
+    <span class="stat-card__label">Train / Test Split</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card__value">{{ "%.2f"|format(metrics.results[metrics.best_model].accuracy * 100) }}%</span>
+    <span class="stat-card__label">Best Accuracy</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card__value">{{ "%.3f"|format(metrics.results[metrics.best_model].f1) }}</span>
+    <span class="stat-card__label">Best F1 Score</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Model Comparison</h2>
+  <p class="muted">Selected model: <strong>{{ metrics.best_model }}</strong> (highest F1 on held-out test set)</p>
+  <div class="table-wrap">
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Train Time (s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for name, m in metrics.results.items() %}
+        <tr class="{{ 'best-row' if name == metrics.best_model else '' }}">
+          <td>{{ name }}{% if name == metrics.best_model %} <span class="badge-mini">BEST</span>{% endif %}</td>
+          <td>{{ "%.4f"|format(m.accuracy) }}</td>
+          <td>{{ "%.4f"|format(m.precision) }}</td>
+          <td>{{ "%.4f"|format(m.recall) }}</td>
+          <td>{{ "%.4f"|format(m.f1) }}</td>
+          <td>{{ m.train_seconds }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Visual Evaluation</h2>
+  <div class="figure-grid">
+    <figure><img src="{{ url_for('report_figure', filename='model_comparison.png') }}" alt="Model comparison chart"><figcaption>Model comparison across metrics</figcaption></figure>
+    <figure><img src="{{ url_for('report_figure', filename='confusion_matrix.png') }}" alt="Confusion matrix"><figcaption>Confusion matrix (best model)</figcaption></figure>
+    <figure><img src="{{ url_for('report_figure', filename='roc_curve.png') }}" alt="ROC curve"><figcaption>ROC curve (best model)</figcaption></figure>
+    <figure><img src="{{ url_for('report_figure', filename='class_distribution.png') }}" alt="Class distribution"><figcaption>Dataset class balance</figcaption></figure>
+    <figure><img src="{{ url_for('report_figure', filename='text_length_distribution.png') }}" alt="Article length distribution"><figcaption>Article length distribution</figcaption></figure>
+    <figure><img src="{{ url_for('report_figure', filename='top_predictive_words.png') }}" alt="Top predictive words"><figcaption>Most predictive words by class</figcaption></figure>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Pipeline Configuration</h2>
+  <ul class="config-list">
+    <li><strong>Vectorizer:</strong> TF-IDF, max {{ metrics.tfidf_max_features }} features, n-grams {{ metrics.tfidf_ngram_range }}</li>
+    <li><strong>Candidate models:</strong> Logistic Regression, Passive Aggressive, Linear SVM, Multinomial Naive Bayes</li>
+    <li><strong>Selection criteria:</strong> highest F1 score on the held-out test set</li>
+  </ul>
+</section>
+{% else %}
+<section class="panel">
+  <p>No trained model found yet. Run <code>python -m src.train</code> and refresh this page.</p>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Detector{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Verify a news article in seconds</h1>
+  <p class="hero__subtitle">
+    Paste a headline and/or article body below. Our TF-IDF + Linear SVM model,
+    trained on 6,300+ labelled news articles, will classify it as
+    <strong>REAL</strong> or <strong>FAKE</strong> with a confidence score.
+  </p>
+</section>
+
+<section class="panel">
+  <form id="predict-form">
+    <label for="title">Headline <span class="optional">(optional)</span></label>
+    <input type="text" id="title" name="title" placeholder="e.g. Senate passes new infrastructure bill">
+
+    <label for="text">Article text <span class="optional">(at least one field required)</span></label>
+    <textarea id="text" name="text" rows="9" placeholder="Paste the full article text here..."></textarea>
+
+    <div class="form-actions">
+      <button type="submit" id="submit-btn">Analyze Article</button>
+      <button type="button" id="sample-btn" class="secondary">Try Sample News</button>
+      <span id="word-count" class="word-count"></span>
+    </div>
+  </form>
+
+  <div id="result" class="result hidden">
+    <div class="result__badge" id="result-badge"></div>
+    <div class="result__details">
+      <div class="result__confidence">
+        <span>Confidence</span>
+        <div class="confidence-bar"><div id="confidence-fill" class="confidence-fill"></div></div>
+        <span id="confidence-value"></span>
+      </div>
+      <p class="result__note">
+        This is a statistical prediction based on writing patterns learned from historical data.
+        Always verify important claims against trusted primary sources.
+      </p>
+    </div>
+  </div>
+
+  <div id="error" class="error hidden"></div>
+</section>
+{% endblock %}

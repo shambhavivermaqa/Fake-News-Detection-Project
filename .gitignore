@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Environment
+.env
+
+# Generated ML artifacts (reproducible via `python -m src.train`)
+dataset/processed/
+models/*.joblib
+reports/metrics.json
+reports/figures/*.png
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
